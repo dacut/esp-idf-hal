@@ -40,6 +40,8 @@ pub mod hall;
 #[cfg(not(feature = "riscv-ulp-hal"))]
 pub mod i2c;
 #[cfg(not(feature = "riscv-ulp-hal"))]
+pub mod i2s;
+#[cfg(not(feature = "riscv-ulp-hal"))]
 pub mod interrupt;
 #[cfg(not(feature = "riscv-ulp-hal"))]
 pub mod ledc;
