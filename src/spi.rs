@@ -239,7 +239,7 @@ pub mod config {
         /// This property can be set to configure a SPI Device for being write only.
         /// Thus the flag `SPI_DEVICE_NO_DUMMY` will be passed on initialization and
         /// it will unlock the possibility of using 80Mhz as the bus freq.
-        /// 
+        ///
         /// See [the Espressif documentation on timing considerations](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/peripherals/spi_master.html#timing-considerations)
         /// for more details.
         pub write_only: bool,
