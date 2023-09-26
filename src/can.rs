@@ -195,16 +195,16 @@ pub mod config {
     /// ## Examples
     ///
     /// This shows how 11 bit CAN ID `0x3AA` goes through filtering engine and is finally accepted:
-    /// ```
-    /// // incoming id [ 0 1 1 1 0 1 0 1 0 1 0 ]
-    /// // mask        [ 1 0 1 0 0 1 1 1 0 0 0 ]
-    /// //               1 = compare
-    /// //               0 = do not care
-    /// // masked id   [ 0 _ 1 _ _ 1 0 1 _ _ _ ]
-    /// // filter      [ 0 0 1 1 1 1 0 1 0 1 1 ]
-    ///
-    /// // incoming id [ 0 1 1 1 0 1 0 1 0 1 0 ]
-    /// // accepted
+    /// ```text
+    ///     incoming id [ 0 1 1 1 0 1 0 1 0 1 0 ]
+    ///     mask        [ 1 0 1 0 0 1 1 1 0 0 0 ]
+    ///                   1 = compare
+    ///                   0 = do not care
+    ///     masked id   [ 0 _ 1 _ _ 1 0 1 _ _ _ ]
+    ///     filter      [ 0 0 1 1 1 1 0 1 0 1 1 ]
+    ///     
+    ///     incoming id [ 0 1 1 1 0 1 0 1 0 1 0 ]
+    ///     accepted
     /// ```
     ///
     /// Notice that for example `0x7AA` would not be accepted because its MSB bit is `1`,

@@ -763,7 +763,7 @@ impl<'d> UartDriver<'d> {
 
     /// Split the serial driver in separate TX and RX drivers.
     ///
-    /// Unlike [`split`], the halves are owned and reference counted.
+    /// Unlike [`split()`][Self::split], the halves are owned and reference counted.
     pub fn into_split(self) -> (UartTxDriver<'d>, UartRxDriver<'d>) {
         let port = self.port;
         let tx_queue = self

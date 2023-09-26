@@ -99,7 +99,7 @@ impl From<u32> for PinState {
 
 /// A `Pulse` contains a pin state and a tick count, used in creating a [`Signal`].
 ///
-/// The real time duration of a tick depends on the [`Config::clock_divider`] setting.
+/// The real time duration of a tick depends on the `clock_divider` setting ([`RmtReceiveConfig::clock_divider`] or [`RmtTransmitConfig::clock_divider`]).
 ///
 /// You can create a `Pulse` with a [`Duration`] by using [`Pulse::new_with_duration`].
 ///
@@ -126,7 +126,7 @@ impl Pulse {
     /// Create a [`Pulse`] using a [`Duration`].
     ///
     /// The ticks frequency, which depends on the clock divider set on the channel within a
-    /// [`Transmit`]. To get the frequency for the `ticks_hz` argument, use [`Transmit::counter_clock()`].
+    /// [`TxRmtDriver`]. To get the frequency for the `ticks_hz` argument, use [`TxRmtDriver::counter_clock`].
     ///
     /// # Example
     /// ```
@@ -234,22 +234,6 @@ pub type TxRmtConfig = config::TransmitConfig;
 pub type RxRmtConfig = config::ReceiveConfig;
 
 /// Types used for configuring the [`rmt`][crate::rmt] module.
-///
-/// [`Config`] is used when creating a [`Transmit`][crate::rmt::Transmit] instance.
-///
-/// # Example
-/// ```
-/// # use esp_idf_hal::units::FromValueType;
-/// let carrier = CarrierConfig::new()
-///     .duty_percent(DutyPercent::new(50)?)
-///     .frequency(611.Hz());
-///
-/// let config = Config::new()
-///     .carrier(Some(carrier))
-///     .looping(Loop::Endless)
-///     .clock_divider(255);
-///
-/// ```
 pub mod config {
     use enumset::EnumSet;
     use esp_idf_sys::{EspError, ESP_ERR_INVALID_ARG};
@@ -336,7 +320,21 @@ pub mod config {
         Count(u32),
     }
 
-    /// Used when creating a [`Transmit`][crate::rmt::Transmit] instance.
+    /// Used when creating a [`TxRmtDriver`][crate::rmt::TxRmtDriver] instance.
+    ///
+    /// # Example
+    /// ```
+    /// # use esp_idf_hal::units::FromValueType;
+    /// let carrier = CarrierConfig::new()
+    ///     .duty_percent(DutyPercent::new(50)?)
+    ///     .frequency(611.Hz());
+    ///
+    /// let config = TransmitConfig::new()
+    ///     .carrier(Some(carrier))
+    ///     .looping(Loop::Endless)
+    ///     .clock_divider(255);
+    ///
+    /// ```
     #[derive(Debug, Clone)]
     pub struct TransmitConfig {
         pub clock_divider: u8,
@@ -622,7 +620,7 @@ impl<'d> TxRmtDriver<'d> {
     /// that don't work in interrupt handlers. Iteration must also be fast so that there
     /// are no time-gaps between successive transmissions where the perhipheral has to
     /// wait for items. This can cause weird behavior and can be counteracted with
-    /// increasing [`Config::mem_block_num`] or making iteration more efficient.
+    /// increasing [`RmtTransmitConfig::mem_block_num`] or making iteration more efficient.
     #[cfg(feature = "alloc")]
     pub fn start_iter<T>(&mut self, iter: T) -> Result<(), EspError>
     where
@@ -656,7 +654,7 @@ impl<'d> TxRmtDriver<'d> {
     /// that don't work in interrupt handlers. Iteration must also be fast so that there
     /// are no time-gaps between successive transmissions where the perhipheral has to
     /// wait for items. This can cause weird behavior and can be counteracted with
-    /// increasing [`Config::mem_block_num`] or making iteration more efficient.
+    /// increasing [`RmtTransmitConfig::mem_block_num`] or making iteration more efficient.
 
     pub fn start_iter_blocking<T>(&mut self, iter: T) -> Result<(), EspError>
     where
@@ -772,7 +770,7 @@ impl<'d> Drop for TxRmtDriver<'d> {
 
 unsafe impl<'d> Send for TxRmtDriver<'d> {}
 
-/// Signal storage for [`Transmit`] in a format ready for the RMT driver.
+/// Signal storage for [`TxRmtDriver`] in a format ready for the RMT driver.
 pub trait Signal {
     fn as_slice(&self) -> &[rmt_item32_t];
 }

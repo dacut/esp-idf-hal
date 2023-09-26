@@ -724,7 +724,7 @@ where
     ///
     /// # Note
     /// This can only be called when the channel is in the `READY` state: initialized but not yet started from a driver
-    /// constructor, or disabled from the `RUNNING` state via [`rx_enable()`][I2sRxChannel::rx_disable]. The channel
+    /// constructor, or disabled from the `RUNNING` state via [`rx_enable()`][I2sDriver::rx_disable]. The channel
     /// will enter the `RUNNING` state if it is enabled successfully.
     ///
     /// Enabling the channel will start I2S communications on the hardware. BCLK and WS signals will be generated if
@@ -741,7 +741,7 @@ where
     ///
     /// # Note
     /// This can only be called when the channel is in the `RUNNING` state: the channel has been previously enabled
-    /// via a call to [`rx_enable()`][I2sRxChannel::rx_enable]. The channel will enter the `READY` state if it is
+    /// via a call to [`rx_enable()`][I2sDriver::rx_enable]. The channel will enter the `READY` state if it is
     /// disabled successfully.
     ///
     /// Disabling the channel will stop I2S communications on the hardware. BCLK and WS signals will stop being
@@ -758,7 +758,7 @@ where
     ///
     /// # Note
     /// This can only be called when the channel is in the `RUNNING` state: the channel has been previously enabled
-    /// via a call to [`rx_enable()`][I2sRxChannel::rx_enable]. The channel will enter the `READY` state if it is
+    /// via a call to [`rx_enable()`][I2sDriver::rx_enable]. The channel will enter the `READY` state if it is
     /// disabled successfully.
     ///
     /// Disabling the channel will stop I2S communications on the hardware. BCLK and WS signals will stop being
@@ -850,7 +850,7 @@ where
     /// This may be called only when the channel is in the `RUNNING` state.
     ///
     /// # Returns
-    /// This returns the number of bytes read, or an [EspError] if an error occurred.
+    /// This returns the number of bytes read, or an [`EspError`] if an error occurred.
     ///
     /// # Safety
     /// Upon a successful return with `Ok(n_read)`, `buffer[..n_read]` will be initialized.
@@ -949,7 +949,7 @@ where
     ///
     /// # Note
     /// This can only be called when the channel is in the `READY` state: initialized but not yet started from a driver
-    /// constructor, or disabled from the `RUNNING` state via [`tx_disable()`][I2sTxChannel::tx_disable]. The channel
+    /// constructor, or disabled from the `RUNNING` state via [`tx_disable()`][I2sDriver::tx_disable]. The channel
     /// will enter the `RUNNING` state if it is enabled successfully.
     ///
     /// Enabling the channel will start I2S communications on the hardware. BCLK and WS signals will be generated if
@@ -966,7 +966,7 @@ where
     ///
     /// # Note
     /// This can only be called when the channel is in the `READY` state: initialized but not yet started from a driver
-    /// constructor, or disabled from the `RUNNING` state via [`tx_disable()`][I2sTxChannel::tx_disable]. The channel
+    /// constructor, or disabled from the `RUNNING` state via [`tx_disable()`][I2sDriver::tx_disable]. The channel
     /// will enter the `RUNNING` state if it is enabled successfully.
     ///
     /// Enabling the channel will start I2S communications on the hardware. BCLK and WS signals will be generated if
@@ -983,7 +983,7 @@ where
     ///
     /// # Note
     /// This can only be called when the channel is in the `RUNNING` state: the channel has been previously enabled
-    /// via a call to [`tx_enable()`][I2sTxChannel::tx_enable]. The channel will enter the `READY` state if it is
+    /// via a call to [`tx_enable()`][I2sDriver::tx_enable]. The channel will enter the `READY` state if it is
     /// disabled successfully.
     ///
     /// Disabling the channel will stop I2S communications on the hardware. BCLK and WS signals will stop being
@@ -1000,7 +1000,7 @@ where
     ///
     /// # Note
     /// This can only be called when the channel is in the `RUNNING` state: the channel has been previously enabled
-    /// via a call to [`tx_enable()`][I2sTxChannel::tx_enable]. The channel will enter the `READY` state if it is disabled
+    /// via a call to [`tx_enable()`][I2sDriver::tx_enable]. The channel will enter the `READY` state if it is disabled
     /// successfully.
     ///
     /// Disabling the channel will stop I2S communications on the hardware. BCLK and WS signals will stop being
@@ -1018,7 +1018,7 @@ where
     /// This may be called only when the channel is in the `READY` state: initialized but not yet started.
     ///
     /// This is used to preload data into the DMA buffer so that valid data can be transmitted immediately after the
-    /// channel is enabled via [`tx_enable()`][I2sTxChannel::tx_enable]. If this function is not called before enabling the channel,
+    /// channel is enabled via [`tx_enable()`][I2sDriver::tx_enable]. If this function is not called before enabling the channel,
     /// empty data will be transmitted.
     ///
     /// This function can be called multiple times before enabling the channel. Additional calls will concatenate the

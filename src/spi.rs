@@ -24,10 +24,9 @@
 //! * True non-blocking async possible only when all devices attached to the SPI bus are used in async mode (i.e. calling methods `xxx_async()`
 //!   instead of their blocking `xxx()` counterparts)
 //!
-//! The [Transfer::transfer], [Write::write] and [WriteIter::write_iter] functions lock the
+//! The [`SpiBusDriver::transfer()`], [`Write::write()`][embedded_hal_0_2::blocking::spi::Write::write] and
+//! [`WriteIter::write_iter()`][embedded_hal_0_2::blocking::spi::WriteIter::write_iter] functions lock the
 //! APB frequency and therefore the requests are always run at the requested baudrate.
-//! The primitive [FullDuplex::read] and [FullDuplex::send] do not lock the APB frequency and
-//! therefore may run at a different frequency.
 //!
 //! # TODO
 //! - Quad SPI
@@ -236,10 +235,13 @@ pub mod config {
     pub struct Config {
         pub baudrate: Hertz,
         pub data_mode: Mode,
-        /// This property can be set to configure a SPI Device for being write only
-        /// Thus the flag SPI_DEVICE_NO_DUMMY will be passed on initialization and
-        /// it will unlock the possibility of using 80Mhz as the bus freq
-        /// See https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/peripherals/spi_master.html#timing-considerations
+
+        /// This property can be set to configure a SPI Device for being write only.
+        /// Thus the flag `SPI_DEVICE_NO_DUMMY` will be passed on initialization and
+        /// it will unlock the possibility of using 80Mhz as the bus freq.
+        /// 
+        /// See [the Espressif documentation on timing considerations](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/peripherals/spi_master.html#timing-considerations)
+        /// for more details.
         pub write_only: bool,
         pub duplex: Duplex,
         pub bit_order: BitOrder,

@@ -145,7 +145,7 @@ impl<'d> LedcTimerDriver<'d> {
         })
     }
 
-    /// Pauses the timer. Operation can be resumed with [`resume_timer()`].
+    /// Pauses the timer. Operation can be resumed with [`resume()`][Self::resume].
     pub fn pause(&mut self) -> Result<(), EspError> {
         esp!(unsafe { ledc_timer_pause(self.speed_mode.into(), self.timer()) })?;
         Ok(())

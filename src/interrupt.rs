@@ -250,7 +250,8 @@ impl IsrCriticalSection {
     /// section and re-enables its interrupts. The second core will then - in turn - disable
     /// its interrupts and own the spinlock.
     ///
-    /// For more information, refer to https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/freertos-smp.html#critical-sections
+    /// For more information, refer to the
+    /// [Espressif documentation on FreeRTOS critical sections](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/freertos-smp.html#critical-sections).
     #[inline(always)]
     #[link_section = ".iram1.interrupt_cs_enter"]
     pub fn enter(&self) -> IsrCriticalSectionGuard {
