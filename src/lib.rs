@@ -8,6 +8,7 @@
     allow(incomplete_features)
 )]
 #![allow(clippy::unused_unit)] // enumset
+#![deny(rustdoc::broken_intra_doc_links)]
 
 #[cfg(all(not(feature = "riscv-ulp-hal"), not(feature = "esp-idf-sys")))]
 compile_error!("Exactly one of the features `esp-idf-sys` or `riscv-ulp-hal` needs to be enabled");
