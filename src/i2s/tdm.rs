@@ -93,7 +93,10 @@ pub(super) mod config {
         /// The mode field is not fully set by this function. Only the controller/target field is set. Before using,
         /// the following bits must be considered: `I2S_MODE_TX`, `I2S_MODE_RX`. `I2S_MODE_DAC_BUILT_IN`, and
         /// `I2S_MODE_ADC_BUILT_IN`, and `I2S_MODE_PDM` should not be used here.
-        #[cfg(all(esp_idf_version_major = "4", any(esp32, esp32s2, esp32s3, esp32c3, esp32c6)))]
+        #[cfg(all(
+            esp_idf_version_major = "4",
+            any(esp32, esp32s2, esp32s3, esp32c3, esp32c6)
+        ))]
         pub(crate) fn as_sdk(&self) -> i2s_driver_config_t {
             i2s_driver_config_t {
                 mode: self.channel_cfg.role.as_sdk(),
