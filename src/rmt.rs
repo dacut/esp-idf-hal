@@ -861,7 +861,8 @@ impl<const N: usize> Default for FixedLengthSignal<N> {
 /// signal.push(Pulse::new(PinState::Low, PulseTicks::new(9)));
 /// ```
 
-#[cfg(feature = "alloc")]
+#[cfg(any(feature = "alloc", doc))]
+#[cfg_attr(feature = "nightly", doc(cfg(feature = "alloc")))]
 #[derive(Clone, Default)]
 pub struct VariableLengthSignal {
     items: alloc::vec::Vec<rmt_item32_t>,
@@ -871,7 +872,8 @@ pub struct VariableLengthSignal {
     next_item_is_new: bool,
 }
 
-#[cfg(feature = "alloc")]
+#[cfg(any(feature = "alloc", doc))]
+#[cfg_attr(feature = "nightly", doc(cfg(feature = "alloc")))]
 impl VariableLengthSignal {
     pub const fn new() -> Self {
         Self {
@@ -938,7 +940,8 @@ impl VariableLengthSignal {
     }
 }
 
-#[cfg(feature = "alloc")]
+#[cfg(any(feature = "alloc", doc))]
+#[cfg_attr(feature = "nightly", doc(cfg(feature = "alloc")))]
 impl Signal for VariableLengthSignal {
     fn as_slice(&self) -> &[rmt_item32_t] {
         &self.items

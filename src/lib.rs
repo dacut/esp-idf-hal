@@ -45,12 +45,22 @@ pub mod gpio;
 pub mod hall;
 #[cfg(not(feature = "riscv-ulp-hal"))]
 pub mod i2c;
-#[cfg(all(
-    not(feature = "riscv-ulp-hal"),
-    esp_idf_soc_i2s_supported,
-    esp_idf_comp_driver_enabled
+#[cfg(any(
+    all(
+        not(feature = "riscv-ulp-hal"),
+        any(esp32, esp32s2, esp32s3, esp32c3, esp32c6, esp32h2),
+        esp_idf_comp_driver_enabled
+    ),
+    doc
 ))]
-#[cfg_attr(feature = "nightly", doc(cfg(esp_idf_soc_adc_supported)))]
+#[cfg_attr(
+    feature = "nightly",
+    doc(cfg(all(
+        not(feature = "riscv-ulp-hal"),
+        any(esp32, esp32s2, esp32s3, esp32c3, esp32c6, esp32h2),
+        esp_idf_comp_driver_enabled
+    )))
+)]
 pub mod i2s;
 #[cfg(not(feature = "riscv-ulp-hal"))]
 pub mod interrupt;

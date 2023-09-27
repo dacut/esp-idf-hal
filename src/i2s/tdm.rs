@@ -1,7 +1,21 @@
 //! Time-division multiplexing (TDM) support for I2S.
+//!
+//! # Microcontroller support for TDM mode
+//!
+//! | Microcontroller    | TDM              |
+//! |--------------------|------------------|
+//! | ESP32              | _not supported_  |
+//! | ESP32-S2           | _not supported_  |
+//! | ESP32-S3           | I2S0 / I2S1      |
+//! | ESP32-C2 (ESP8684) | _not supported_  |
+//! | ESP32-C3           | I2S0             |
+//! | ESP32-C6           | I2S0             |
+//! | ESP32-H2           | I2S0             |
+//!
 use super::*;
+#[allow(unused)]
 use crate::{gpio::*, peripheral::*};
-
+#[allow(unused)]
 use esp_idf_sys::*;
 
 pub(super) mod config {
@@ -56,7 +70,7 @@ pub(super) mod config {
         }
 
         /// Convert to the ESP-IDF SDK `i2s_tdm_config_t` representation.
-        #[cfg(not(esp_idf_version_major = "4"))]
+        #[cfg(all(not(esp_idf_version_major = "4"), esp_idf_soc_i2s_supports_tdm))]
         #[inline(always)]
         pub(super) fn as_sdk<'d>(
             &self,
@@ -79,7 +93,7 @@ pub(super) mod config {
         /// The mode field is not fully set by this function. Only the controller/target field is set. Before using,
         /// the following bits must be considered: `I2S_MODE_TX`, `I2S_MODE_RX`. `I2S_MODE_DAC_BUILT_IN`, and
         /// `I2S_MODE_ADC_BUILT_IN`, and `I2S_MODE_PDM` should not be used here.
-        #[cfg(esp_idf_version_major = "4")]
+        #[cfg(all(esp_idf_version_major = "4", any(esp32s3, esp32c3, esp32c6)))]
         pub(crate) fn as_sdk(&self) -> i2s_driver_config_t {
             i2s_driver_config_t {
                 mode: self.channel_cfg.role.as_sdk(),
@@ -217,7 +231,11 @@ pub(super) mod config {
         }
 
         /// Convert to the ESP-IDF SDK `i2s_tdm_clk_config_t` representation.
-        #[cfg(all(esp_idf_version_major = "5", esp_idf_version_minor = "0"))]
+        #[cfg(all(
+            esp_idf_version_major = "5",
+            esp_idf_version_minor = "0",
+            esp_idf_soc_i2s_supports_tdm
+        ))]
         #[inline(always)]
         pub(crate) fn as_sdk(&self) -> i2s_tdm_clk_config_t {
             i2s_tdm_clk_config_t {
@@ -228,7 +246,11 @@ pub(super) mod config {
         }
 
         /// Convert to the ESP-IDF SDK `i2s_tdm_clk_config_t` representation.
-        #[cfg(all(esp_idf_version_major = "5", not(esp_idf_version_minor = "0")))]
+        #[cfg(all(
+            esp_idf_version_major = "5",
+            not(esp_idf_version_minor = "0"),
+            esp_idf_soc_i2s_supports_tdm
+        ))]
         #[allow(clippy::needless_update)]
         #[inline(always)]
         pub(crate) fn as_sdk(&self) -> i2s_tdm_clk_config_t {
@@ -290,7 +312,7 @@ pub(super) mod config {
         }
 
         /// Convert to the ESP-IDF SDK `i2s_tdm_gpio_config_t` representation.
-        #[cfg(not(esp_idf_version_major = "4"))]
+        #[cfg(all(not(esp_idf_version_major = "4"), esp_idf_soc_i2s_supports_tdm))]
         pub(crate) fn as_sdk<'d>(
             &self,
             bclk: PeripheralRef<'d, impl InputPin + OutputPin>,
@@ -636,7 +658,7 @@ pub(super) mod config {
         }
 
         /// Convert to the ESP-IDF SDK `i2s_tdm_slot_config_t` representation.
-        #[cfg(not(esp_idf_version_major = "4"))]
+        #[cfg(all(not(esp_idf_version_major = "4"), esp_idf_soc_i2s_supports_tdm))]
         #[inline(always)]
         pub(crate) fn as_sdk(&self) -> i2s_tdm_slot_config_t {
             i2s_tdm_slot_config_t {
@@ -958,7 +980,7 @@ pub(super) mod config {
         }
 
         /// Converts this mask to an ESP-IDF SDK `i2s_tdm_slot_mask_t` value.
-        #[cfg(not(esp_idf_version_major = "4"))]
+        #[cfg(all(not(esp_idf_version_major = "4"), esp_idf_soc_i2s_supports_tdm))]
         #[inline(always)]
         pub(super) fn as_sdk(&self) -> i2s_tdm_slot_mask_t {
             self.0 as i2s_tdm_slot_mask_t
@@ -974,7 +996,7 @@ pub(super) mod config {
 }
 
 impl<'d, Dir> I2sDriver<'d, Dir> {
-    #[cfg(not(esp_idf_version_major = "4"))]
+    #[cfg(all(not(esp_idf_version_major = "4"), esp_idf_soc_i2s_supports_tdm))]
     #[allow(clippy::too_many_arguments)]
     fn internal_new_tdm<I2S: I2s>(
         _i2s: impl Peripheral<P = I2S> + 'd,
@@ -1017,7 +1039,7 @@ impl<'d, Dir> I2sDriver<'d, Dir> {
         Ok(this)
     }
 
-    #[cfg(esp_idf_version_major = "4")]
+    #[cfg(all(esp_idf_version_major = "4", any(esp32s3, esp32c3, esp32c6)))]
     #[allow(clippy::too_many_arguments)]
     fn internal_new_tdm<I2S: I2s>(
         _i2s: impl Peripheral<P = I2S> + 'd,
@@ -1062,7 +1084,7 @@ impl<'d, Dir> I2sDriver<'d, Dir> {
 
 impl<'d> I2sDriver<'d, I2sBiDir> {
     /// Create a new TDM mode driver for the given I2S peripheral with both the receive and transmit channels open.
-    #[cfg(not(any(esp32, esp32s2)))]
+    #[cfg(any(not(any(esp32, esp32s2)), doc))]
     #[cfg_attr(feature = "nightly", doc(cfg(not(any(esp32, esp32s2)))))]
     #[allow(clippy::too_many_arguments)]
     pub fn new_tdm_bidir<I2S: I2s>(
@@ -1090,8 +1112,8 @@ impl<'d> I2sDriver<'d, I2sBiDir> {
 
 impl<'d> I2sDriver<'d, I2sRx> {
     /// Create a new TDM mode driver for the given I2S peripheral with only the receive channel open.
-    #[cfg(not(any(esp32, esp32s2)))]
-    #[cfg_attr(feature = "nightly", doc(cfg(not(any(esp32, esp32s2)))))]
+    #[cfg(any(not(any(esp32, esp32s2, esp32c2)), doc))]
+    #[cfg_attr(feature = "nightly", doc(cfg(not(any(esp32, esp32s2, esp32c2)))))]
     #[allow(clippy::too_many_arguments)]
     pub fn new_tdm_rx<I2S: I2s>(
         i2s: impl Peripheral<P = I2S> + 'd,
@@ -1117,8 +1139,8 @@ impl<'d> I2sDriver<'d, I2sRx> {
 
 impl<'d> I2sDriver<'d, I2sTx> {
     /// Create a new TDM mode driver for the given I2S peripheral with only the transmit channel open.
-    #[cfg(not(any(esp32, esp32s2)))]
-    #[cfg_attr(feature = "nightly", doc(cfg(not(any(esp32, esp32s2)))))]
+    #[cfg(any(not(any(esp32, esp32s2, esp32c2)), doc))]
+    #[cfg_attr(feature = "nightly", doc(cfg(not(any(esp32, esp32s2, esp32c2)))))]
     #[allow(clippy::too_many_arguments)]
     pub fn new_tdm_tx<I2S: I2s>(
         i2s: impl Peripheral<P = I2S> + 'd,

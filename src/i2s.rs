@@ -24,23 +24,8 @@ use esp_idf_sys::{
 use crate::private::notification::Notification;
 use crate::{delay, io::EspIOError};
 
-// For v5+, we rely configuration options for PDM/TDM support.
-// For v4, we have to examine the chip type.
-#[cfg(any(
-    all(
-        not(esp_idf_version_major = "4"),
-        any(esp_idf_soc_i2s_supports_pdm_rx, esp_idf_soc_i2s_supports_pdm_tx)
-    ),
-    all(esp_idf_version_major = "4", any(esp32, esp32s3, esp32c3, esp32c6))
-))]
 mod pdm;
-
 mod std;
-
-#[cfg(any(
-    all(not(esp_idf_version_major = "4"), esp_idf_soc_i2s_supports_tdm),
-    all(esp_idf_version_major = "4", any(esp32s3, esp32c3, esp32c6))
-))]
 mod tdm;
 
 /// I2S channel base configuration.
@@ -48,21 +33,8 @@ pub type I2sConfig = config::Config;
 
 /// I2S configuration
 pub mod config {
-    #[cfg(any(
-        all(
-            not(esp_idf_version_major = "4"),
-            any(esp_idf_soc_i2s_supports_pdm_rx, esp_idf_soc_i2s_supports_pdm_tx)
-        ),
-        all(esp_idf_version_major = "4", any(esp32, esp32s3, esp32c3, esp32c6))
-    ))]
     pub use super::pdm::config::*;
-
     pub use super::std::config::*;
-
-    #[cfg(any(
-        all(not(esp_idf_version_major = "4"), esp_idf_soc_i2s_supports_tdm),
-        all(esp_idf_version_major = "4", any(esp32s3, esp32c3, esp32c6))
-    ))]
     pub use super::tdm::config::*;
 
     use core::convert::TryFrom;

@@ -707,7 +707,10 @@ pub(super) mod config {
 }
 
 impl<'d, Dir> I2sDriver<'d, Dir> {
-    #[cfg(not(esp_idf_version_major = "4"))]
+    #[cfg(all(
+        not(esp_idf_version_major = "4"),
+        any(esp32, esp32s2, esp32s3, esp32c3, esp32c6, esp32h2)
+    ))]
     #[allow(clippy::too_many_arguments)]
     fn internal_new_std<I2S: I2s>(
         _i2s: impl Peripheral<P = I2S> + 'd,
@@ -750,7 +753,10 @@ impl<'d, Dir> I2sDriver<'d, Dir> {
         Ok(this)
     }
 
-    #[cfg(esp_idf_version_major = "4")]
+    #[cfg(all(
+        esp_idf_version_major = "4",
+        any(esp32, esp32s2, esp32s3, esp32c3, esp32c6, esp32h2)
+    ))]
     #[allow(clippy::too_many_arguments)]
     pub fn internal_new_std<I2S: I2s>(
         _i2s: impl Peripheral<P = I2S> + 'd,
@@ -793,6 +799,11 @@ impl<'d, Dir> I2sDriver<'d, Dir> {
     }
 }
 
+#[cfg(any(esp32, esp32s2, esp32s3, esp32c3, esp32c6, esp32h2, doc))]
+#[cfg_attr(
+    feature = "nightly",
+    doc(cfg(any(esp32, esp32s2, esp32s3, esp32c3, esp32c6, esp32h2)))
+)]
 impl<'d> I2sDriver<'d, I2sBiDir> {
     /// Create a new standard mode driver for the given I2S peripheral with both the receive and transmit channels open.
     #[allow(clippy::too_many_arguments)]
@@ -819,6 +830,11 @@ impl<'d> I2sDriver<'d, I2sBiDir> {
     }
 }
 
+#[cfg(any(esp32, esp32s2, esp32s3, esp32c3, esp32c6, esp32h2, doc))]
+#[cfg_attr(
+    feature = "nightly",
+    doc(cfg(any(esp32, esp32s2, esp32s3, esp32c3, esp32c6, esp32h2)))
+)]
 impl<'d> I2sDriver<'d, I2sRx> {
     /// Create a new standard mode driver for the given I2S peripheral with only the receive channel open.
     #[allow(clippy::too_many_arguments)]
@@ -844,6 +860,11 @@ impl<'d> I2sDriver<'d, I2sRx> {
     }
 }
 
+#[cfg(any(esp32, esp32s2, esp32s3, esp32c3, esp32c6, esp32h2, doc))]
+#[cfg_attr(
+    feature = "nightly",
+    doc(cfg(any(esp32, esp32s2, esp32s3, esp32c3, esp32c6, esp32h2)))
+)]
 impl<'d> I2sDriver<'d, I2sTx> {
     /// Create a new standard mode driver for the given I2S peripheral with only the transmit channel open.
     #[allow(clippy::too_many_arguments)]

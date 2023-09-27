@@ -24,7 +24,9 @@
 //!
 //! See the [`PdmTxSlotConfig documentation`][PdmTxSlotConfig] for more details.
 
+#[allow(unused)]
 use super::*;
+#[allow(unused)]
 use crate::{gpio::*, peripheral::Peripheral};
 
 // Note on cfg settings:
@@ -129,6 +131,7 @@ pub(super) mod config {
                 clk_src: self.clk_src.as_sdk(),
                 mclk_multiple: self.mclk_multiple.as_sdk(),
                 dn_sample_mode: self.downsample_mode.as_sdk(),
+                ..Default::default()
             }
         }
     }
@@ -517,6 +520,7 @@ pub(super) mod config {
 
     impl PdmSignalScale {
         /// Convert to the ESP-IDF SDK `i2s_pdm_signal_scale_t` representation.
+        #[cfg(any(esp32, esp32s3, esp32c3, esp32c6))]
         #[cfg_attr(esp_idf_version_major = "4", allow(unused))]
         #[inline(always)]
         pub(crate) fn as_sdk(&self) -> i2s_pdm_sig_scale_t {
@@ -638,7 +642,7 @@ pub(super) mod config {
 
         /// Convert to the ESP-IDF SDK `i2s_pdm_tx_clk_config_t` representation.
         #[allow(clippy::needless_update)]
-        #[cfg(not(esp_idf_version_major = "4"))]
+        #[cfg(all(not(esp_idf_version_major = "4"), esp_idf_soc_i2s_supports_pdm_tx))]
         #[inline(always)]
         pub(super) fn as_sdk(&self) -> i2s_pdm_tx_clk_config_t {
             i2s_pdm_tx_clk_config_t {
@@ -698,7 +702,11 @@ pub(super) mod config {
         }
 
         /// Convert to the ESP-IDF `i2s_pdm_tx_config_t` representation.
-        #[cfg(all(not(esp_idf_version_major = "4"), not(esp_idf_soc_i2s_hw_version_2)))]
+        #[cfg(all(
+            not(esp_idf_version_major = "4"),
+            not(esp_idf_soc_i2s_hw_version_2),
+            esp_idf_soc_i2s_supports_pdm_tx
+        ))]
         #[inline(always)]
         pub(crate) fn as_sdk<'d>(
             &self,
@@ -812,7 +820,7 @@ pub(super) mod config {
         }
 
         /// Convert to the ESP-IDF SDK `i2s_pdm_tx_gpio_config_t` representation.
-        #[cfg(esp_idf_soc_i2s_hw_version_1)]
+        #[cfg(all(esp_idf_soc_i2s_hw_version_1, esp_idf_soc_i2s_supports_pdm_tx))]
         pub(crate) fn as_sdk<'d>(
             &self,
             clk: PeripheralRef<'d, impl OutputPin>,
@@ -832,7 +840,7 @@ pub(super) mod config {
         }
 
         /// Convert to the ESP-IDF SDK `i2s_pdm_tx_gpio_config_t` representation.
-        #[cfg(esp_idf_soc_i2s_hw_version_2)]
+        #[cfg(all(esp_idf_soc_i2s_hw_version_2, esp_idf_soc_i2s_supports_pdm_tx))]
         pub(crate) fn as_sdk<'d>(
             &self,
             clk: PeripheralRef<'d, impl OutputPin>,
@@ -1046,7 +1054,7 @@ pub(super) mod config {
         }
 
         /// Sets the slot mask on this PDM transmit slot configuration.
-        #[cfg(esp_idf_soc_i2s_hw_version_1)]
+        #[cfg(any(esp_idf_soc_i2s_hw_version_1, doc))]
         #[cfg_attr(
             feature = "nightly",
             doc(cfg(all(esp32, not(esp_idf_version_major = "4"))))
@@ -1093,7 +1101,7 @@ pub(super) mod config {
         }
 
         /// Sets the PDM transmit line mode on this PDM transmit slot configuration.
-        #[cfg(esp_idf_soc_i2s_hw_version_2)]
+        #[cfg(any(esp_idf_soc_i2s_hw_version_2, doc))]
         #[cfg_attr(
             feature = "nightly",
             doc(cfg(all(
@@ -1108,7 +1116,7 @@ pub(super) mod config {
         }
 
         /// Sets the high-pass filter enable on this PDM transmit slot configuration.
-        #[cfg(esp_idf_soc_i2s_hw_version_2)]
+        #[cfg(any(esp_idf_soc_i2s_hw_version_2, doc))]
         #[cfg_attr(
             feature = "nightly",
             doc(cfg(all(
@@ -1123,7 +1131,7 @@ pub(super) mod config {
         }
 
         /// Sets the high-pass filter cutoff frequency on this PDM transmit slot configuration.
-        #[cfg(esp_idf_soc_i2s_hw_version_2)]
+        #[cfg(any(esp_idf_soc_i2s_hw_version_2, doc))]
         #[cfg_attr(
             feature = "nightly",
             doc(cfg(all(
@@ -1138,7 +1146,7 @@ pub(super) mod config {
         }
 
         /// Sets the sigma-delta filter dither on this PDM transmit slot configuration.
-        #[cfg(esp_idf_soc_i2s_hw_version_2)]
+        #[cfg(any(esp_idf_soc_i2s_hw_version_2, doc))]
         #[cfg_attr(
             feature = "nightly",
             doc(cfg(all(
@@ -1154,7 +1162,7 @@ pub(super) mod config {
         }
 
         /// Convert this to the ESP-IDF SDK `i2s_pdm_tx_slot_config_t` type.
-        #[cfg(not(esp_idf_version_major = "4"))]
+        #[cfg(all(not(esp_idf_version_major = "4"), esp_idf_soc_i2s_supports_pdm_tx))]
         #[inline(always)]
         pub(super) fn as_sdk(&self) -> i2s_pdm_tx_slot_config_t {
             i2s_pdm_tx_slot_config_t {
@@ -1183,7 +1191,7 @@ pub(super) mod config {
     }
 }
 
-#[cfg(esp_idf_soc_i2s_supports_pdm_rx)]
+#[cfg(any(esp_idf_soc_i2s_supports_pdm_rx, doc))]
 #[cfg_attr(
     feature = "nightly",
     doc(cfg(all(any(esp32, esp32s3), not(esp_idf_version_major = "4"))))
@@ -1275,7 +1283,7 @@ impl<'d> I2sDriver<'d, I2sRx> {
     }
 }
 
-#[cfg(all(any(esp32, esp32s3), esp_idf_version_major = "4"))]
+#[cfg(any(all(any(esp32, esp32s3), esp_idf_version_major = "4"), doc))]
 #[cfg_attr(
     feature = "nightly",
     doc(cfg(all(any(esp32, esp32s3), esp_idf_version_major = "4")))
@@ -1318,7 +1326,7 @@ impl<'d> I2sDriver<'d, I2sRx> {
     }
 }
 
-#[cfg(esp_idf_soc_i2s_supports_pdm_tx)]
+#[cfg(any(esp_idf_soc_i2s_supports_pdm_tx, doc))]
 #[cfg_attr(
     feature = "nightly",
     doc(cfg(all(
@@ -1365,16 +1373,19 @@ impl<'d> I2sDriver<'d, I2sTx> {
     }
 }
 
-#[cfg(all(
-    esp_idf_version_major = "4",
-    any(esp32, esp32s3, esp32c3, esp32c6, esp32h2)
+#[cfg(any(
+    all(
+        esp_idf_version_major = "4",
+        any(esp32, esp32s3, esp32c3, esp32c6, esp32h2)
+    ),
+    doc
 ))]
 #[cfg_attr(
     feature = "nightly",
-    doc(all(
+    doc(cfg(all(
         any(esp32, esp32s3, esp32c3, esp32c6, esp32h2),
         esp_idf_version_major = "4"
-    ))
+    )))
 )]
 impl<'d> I2sDriver<'d, I2sTx> {
     /// Create a new pulse density modulation (PDM) mode driver for the given I2S peripheral with only the transmit

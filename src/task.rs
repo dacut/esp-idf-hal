@@ -205,7 +205,7 @@ pub fn get_idle_task(core: crate::cpu::Core) -> TaskHandle_t {
 
     #[cfg(not(any(esp32c3, esp32c2, esp32h2, esp32c5, esp32c6)))]
     unsafe {
-        xTaskGetIdleTaskHandleForCPU(core as u32)
+        xTaskGetIdleTaskHandleForCPU(core as _)
     }
 }
 
