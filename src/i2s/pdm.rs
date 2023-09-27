@@ -40,6 +40,7 @@ use esp_idf_sys::*;
 pub(super) mod config {
     #[allow(unused)]
     use crate::{gpio::*, i2s::config::*, peripheral::*};
+    #[allow(unused)]
     use esp_idf_sys::*;
 
     /// I2S pulse density modulation (PDM) downsampling mode.
@@ -125,13 +126,14 @@ pub(super) mod config {
             not(esp_idf_version_major = "4")
         ))]
         #[inline(always)]
+        #[allow(clippy::needless_update)]
         pub(super) fn as_sdk(&self) -> i2s_pdm_rx_clk_config_t {
             i2s_pdm_rx_clk_config_t {
                 sample_rate_hz: self.sample_rate_hz,
                 clk_src: self.clk_src.as_sdk(),
                 mclk_multiple: self.mclk_multiple.as_sdk(),
                 dn_sample_mode: self.downsample_mode.as_sdk(),
-                ..Default::default()
+                ..Default::default() // set bclk_div for newer versions of ESP-IDF
             }
         }
     }
@@ -656,7 +658,10 @@ pub(super) mod config {
         }
 
         /// Convert to the ESP-IDF SDK `i2s_pdm_tx_upsample_cfg_t` representation.
-        #[cfg(esp_idf_version_major = "4")]
+        #[cfg(all(
+            esp_idf_version_major = "4",
+            any(esp32, esp32s3, esp32c3, esp32c6, esp32h2)
+        ))]
         #[inline(always)]
         pub(super) fn as_sdk(&self) -> i2s_pdm_tx_upsample_cfg_t {
             i2s_pdm_tx_upsample_cfg_t {
