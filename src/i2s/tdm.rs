@@ -93,7 +93,7 @@ pub(super) mod config {
         /// The mode field is not fully set by this function. Only the controller/target field is set. Before using,
         /// the following bits must be considered: `I2S_MODE_TX`, `I2S_MODE_RX`. `I2S_MODE_DAC_BUILT_IN`, and
         /// `I2S_MODE_ADC_BUILT_IN`, and `I2S_MODE_PDM` should not be used here.
-        #[cfg(all(esp_idf_version_major = "4", any(esp32s3, esp32c3, esp32c6)))]
+        #[cfg(all(esp_idf_version_major = "4", any(esp32, esp32s2, esp32s3, esp32c3, esp32c6)))]
         pub(crate) fn as_sdk(&self) -> i2s_driver_config_t {
             i2s_driver_config_t {
                 mode: self.channel_cfg.role.as_sdk(),
@@ -987,7 +987,7 @@ pub(super) mod config {
         }
 
         /// Converts this mask to an ESP-IDF SDK `i2s_channel_t` value.
-        #[cfg(esp_idf_version_major = "4")]
+        #[cfg(all(esp_idf_version_major = "4", any(esp32s3, esp32c3, esp32c6)))]
         #[inline(always)]
         pub(super) fn as_sdk(&self) -> i2s_channel_t {
             ((self.0 as u32) << 16) as i2s_channel_t
@@ -1084,8 +1084,8 @@ impl<'d, Dir> I2sDriver<'d, Dir> {
 
 impl<'d> I2sDriver<'d, I2sBiDir> {
     /// Create a new TDM mode driver for the given I2S peripheral with both the receive and transmit channels open.
-    #[cfg(any(not(any(esp32, esp32s2)), doc))]
-    #[cfg_attr(feature = "nightly", doc(cfg(not(any(esp32, esp32s2)))))]
+    #[cfg(any(any(esp32s3, esp32c3, esp32c6), doc))]
+    #[cfg_attr(feature = "nightly", doc(cfg(any(esp32s3, esp32c3, esp32c6))))]
     #[allow(clippy::too_many_arguments)]
     pub fn new_tdm_bidir<I2S: I2s>(
         i2s: impl Peripheral<P = I2S> + 'd,
@@ -1140,7 +1140,7 @@ impl<'d> I2sDriver<'d, I2sRx> {
 impl<'d> I2sDriver<'d, I2sTx> {
     /// Create a new TDM mode driver for the given I2S peripheral with only the transmit channel open.
     #[cfg(any(not(any(esp32, esp32s2, esp32c2)), doc))]
-    #[cfg_attr(feature = "nightly", doc(cfg(not(any(esp32, esp32s2, esp32c2)))))]
+    #[cfg_attr(feature = "nightly", doc(cfg(any(esp32s3, esp32c3, esp32c6))))]
     #[allow(clippy::too_many_arguments)]
     pub fn new_tdm_tx<I2S: I2s>(
         i2s: impl Peripheral<P = I2S> + 'd,
